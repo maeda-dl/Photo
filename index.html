@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>あみだくじ</title>
 <style>
-  body { font-family: sans-serif; text-align:center; padding:10px; }
+  body { font-family:sans-serif; text-align:center; padding:10px; }
   h1 { font-size:20px; }
   #members-container { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
   .member { width:60px; height:60px; border:2px solid #aaa; border-radius:8px; overflow:hidden; cursor:pointer; }
@@ -105,7 +105,7 @@ startButton.addEventListener("click", ()=>{
   output+="</ul>";
   result.innerHTML=output;
 
-  // Googleスプレッドシートに送信
+  // 🔹 Googleスプレッドシートに送信
   fetch("https://script.google.com/macros/s/AKfycbw5vHQwbTU9psJaqu-glyq04XI3m5rzWJBEw3Ip1Pavi5jKbkJ8TAt29RqtJdJKXn7NNw/exec",{
     method:"POST",
     body:JSON.stringify({results}),
