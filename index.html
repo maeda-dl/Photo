@@ -2,30 +2,38 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>あみだくじ</title>
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
-      padding: 20px;
+      padding: 10px;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 10px;
     }
 
     #upload-area {
-      margin: 20px;
+      margin: 10px 0;
     }
 
     #members-container {
       display: flex;
       justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 15px;
     }
 
     .member {
-      width: 60px;
-      height: 60px;
+      width: 50px;
+      height: 50px;
       border: 2px solid #aaa;
-      border-radius: 8px;
+      border-radius: 6px;
       overflow: hidden;
       cursor: grab;
     }
@@ -39,42 +47,49 @@
     #amida-slots {
       display: flex;
       justify-content: center;
-      gap: 40px;
-      margin: 20px 0;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 15px 0;
     }
 
     .slot {
-      width: 60px;
-      height: 60px;
+      width: 50px;
+      height: 50px;
       border: 2px dashed #ccc;
-      border-radius: 8px;
+      border-radius: 6px;
       background-color: #f0f0f0;
     }
 
     #start-button {
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 8px 16px;
+      font-size: 14px;
       cursor: pointer;
+      border-radius: 6px;
+      border: none;
+      background: #4caf50;
+      color: white;
     }
 
     #result {
-      margin-top: 30px;
-      font-size: 20px;
+      margin-top: 20px;
+      font-size: 16px;
       font-weight: bold;
     }
 
     ul {
       list-style: none;
       padding: 0;
+      margin: 0;
     }
 
     li {
-      margin: 10px 0;
+      margin: 6px 0;
+      font-size: 14px;
     }
 
     li img {
       vertical-align: middle;
-      margin-right: 10px;
+      margin-right: 6px;
       border-radius: 50%;
     }
   </style>
@@ -82,24 +97,15 @@
 <body>
   <h1>あみだくじ</h1>
 
-<p>
-  <label>📷 カメラ撮影
-    <input type="file" accept="image/*" capture="environment">
-  </label>
-</p>
-<p>
-  <label>🖼 ファイル選択
-    <input type="file" accept="image/*">
-  </label>
-</p>
-
-
+  <div id="upload-area">
+    <input type="file" id="imageUpload" multiple accept="image/*">
+    <p style="font-size:12px;">※ カメラ撮影または画像選択（最大5人まで）</p>
+  </div>
 
   <div id="members-container"></div>
 
-  <h2>↓ ドラッグして配置してください ↓</h2>
+  <h2 style="font-size:16px;">↓ ドラッグして配置 ↓</h2>
   <div id="amida-slots">
-    <!-- ドラッグドロップ先 -->
     <div class="slot" data-slot="0"></div>
     <div class="slot" data-slot="1"></div>
     <div class="slot" data-slot="2"></div>
@@ -120,10 +126,10 @@
 
     let members = [];
 
+    // 画像アップロード
     imageUpload.addEventListener("change", (e) => {
       const files = Array.from(e.target.files).slice(0, 5);
       members = [];
-
       membersContainer.innerHTML = "";
 
       files.forEach((file, index) => {
@@ -146,6 +152,7 @@
       });
     });
 
+    // スロットへのドラッグ&ドロップ
     slots.forEach((slot) => {
       slot.addEventListener("dragover", (e) => {
         e.preventDefault();
@@ -162,12 +169,16 @@
         const id = e.dataTransfer.getData("text/plain");
         const dragged = document.getElementById(id);
 
-        // 既存の画像を消して、新しいのを挿入
-        slot.innerHTML = "";
-        slot.appendChild(dragged.cloneNode(true));
+        if (dragged) {
+          slot.innerHTML = "";
+          const clone = dragged.cloneNode(true);
+          clone.id = id + "-slot";
+          slot.appendChild(clone);
+        }
       });
     });
 
+    // あみだくじ開始
     startButton.addEventListener("click", () => {
       const assigned = [];
 
@@ -183,13 +194,12 @@
         return;
       }
 
-      // ランダムに商品を割り当て（簡易あみだくじ）
       const prizes = ["🍎 りんご", "🎁 ギフト券", "🍫 チョコ", "☕ コーヒー", "🎉 サプライズ！"];
       const shuffled = prizes.sort(() => Math.random() - 0.5);
 
       let output = "<h3>結果発表 🎉</h3><ul>";
       assigned.forEach((member, i) => {
-        output += `<li><img src="${member.image}" width="30" height="30" /> → ${shuffled[i]}</li>`;
+        output += `<li><img src="${member.image}" width="24" height="24" /> → ${shuffled[i]}</li>`;
       });
       output += "</ul>";
 
