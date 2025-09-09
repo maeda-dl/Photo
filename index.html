@@ -106,7 +106,7 @@ startButton.addEventListener("click", ()=>{
   result.innerHTML=output;
 
   // Googleスプレッドシートに送信
-  fetch("https://script.google.com/macros/library/d/1NaSzAbfqBKO2zAM34cIUXyqLxpLFksmEperVKQD-w7ec7N82cObHi38M/1",{
+  fetch("https://script.google.com/macros/s/AKfycbw5vHQwbTU9psJaqu-glyq04XI3m5rzWJBEw3Ip1Pavi5jKbkJ8TAt29RqtJdJKXn7NNw/exec",{
     method:"POST",
     body:JSON.stringify({results}),
     headers:{"Content-Type":"application/json"}
