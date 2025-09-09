@@ -35,7 +35,7 @@
       border: 2px solid #aaa;
       border-radius: 6px;
       overflow: hidden;
-      cursor: grab;
+      cursor: pointer;
     }
 
     .member img {
@@ -58,6 +58,7 @@
       border: 2px dashed #ccc;
       border-radius: 6px;
       background-color: #f0f0f0;
+      cursor: pointer;
     }
 
     #start-button {
@@ -98,13 +99,18 @@
   <h1>あみだくじ</h1>
 
   <div id="upload-area">
-    <input type="file" id="imageUpload" multiple accept="image/*">
-    <p style="font-size:12px;">※ カメラ撮影または画像選択（最大5人まで）</p>
+    <p>
+      📷 カメラ撮影: <input type="file" id="cameraUpload" accept="image/*" capture="environment">
+    </p>
+    <p>
+      🖼 ファイル/ライブラリ選択: <input type="file" id="fileUpload" multiple accept="image/*">
+    </p>
+    <p style="font-size:12px;">※ 最大5人まで</p>
   </div>
 
   <div id="members-container"></div>
 
-  <h2 style="font-size:16px;">↓ ドラッグして配置 ↓</h2>
+  <h2 style="font-size:16px;">↓ 画像を選んでからスロットをタップして配置 ↓</h2>
   <div id="amida-slots">
     <div class="slot" data-slot="0"></div>
     <div class="slot" data-slot="1"></div>
@@ -118,70 +124,66 @@
   <div id="result"></div>
 
   <script>
-    const imageUpload = document.getElementById("imageUpload");
     const membersContainer = document.getElementById("members-container");
     const slots = document.querySelectorAll(".slot");
     const result = document.getElementById("result");
     const startButton = document.getElementById("start-button");
+    const cameraUpload = document.getElementById("cameraUpload");
+    const fileUpload = document.getElementById("fileUpload");
 
     let members = [];
+    let selectedImage = null;
 
-    // 画像アップロード
-    imageUpload.addEventListener("change", (e) => {
-      const files = Array.from(e.target.files).slice(0, 5);
-      members = [];
-      membersContainer.innerHTML = "";
-
-      files.forEach((file, index) => {
+    // 共通の画像読み込み処理
+    function handleFiles(files) {
+      const fileArray = Array.from(files).slice(0, 5 - members.length);
+      fileArray.forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = () => {
           const div = document.createElement("div");
           div.className = "member";
-          div.draggable = true;
-          div.id = `member-${index}`;
+          const id = `member-${members.length}`;
+          div.id = id;
           div.innerHTML = `<img src="${reader.result}" alt="member${index}" />`;
           membersContainer.appendChild(div);
 
-          members.push({ id: div.id, image: reader.result });
+          members.push({ id: id, image: reader.result });
 
-          div.addEventListener("dragstart", (e) => {
-            e.dataTransfer.setData("text/plain", div.id);
+          // タップで選択
+          div.addEventListener("click", () => {
+            document.querySelectorAll(".member").forEach(m => m.style.borderColor = "#aaa");
+            div.style.borderColor = "red";
+            selectedImage = reader.result;
           });
         };
         reader.readAsDataURL(file);
       });
+    }
+
+    // カメラアップロード
+    cameraUpload.addEventListener("change", (e) => {
+      handleFiles(e.target.files);
     });
 
-    // スロットへのドラッグ&ドロップ
+    // ファイルアップロード
+    fileUpload.addEventListener("change", (e) => {
+      handleFiles(e.target.files);
+    });
+
+    // スロットタップで配置
     slots.forEach((slot) => {
-      slot.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        slot.style.backgroundColor = "#ddd";
-      });
-
-      slot.addEventListener("dragleave", () => {
-        slot.style.backgroundColor = "#f0f0f0";
-      });
-
-      slot.addEventListener("drop", (e) => {
-        e.preventDefault();
-        slot.style.backgroundColor = "#f0f0f0";
-        const id = e.dataTransfer.getData("text/plain");
-        const dragged = document.getElementById(id);
-
-        if (dragged) {
-          slot.innerHTML = "";
-          const clone = dragged.cloneNode(true);
-          clone.id = id + "-slot";
-          slot.appendChild(clone);
+      slot.addEventListener("click", () => {
+        if (!selectedImage) {
+          alert("画像を先に選んでください！");
+          return;
         }
+        slot.innerHTML = `<img src="${selectedImage}" width="100%" height="100%" style="object-fit:cover;border-radius:6px;">`;
       });
     });
 
     // あみだくじ開始
     startButton.addEventListener("click", () => {
       const assigned = [];
-
       slots.forEach((slot, index) => {
         const img = slot.querySelector("img");
         if (img) {
