@@ -82,10 +82,17 @@
 <body>
   <h1>あみだくじ</h1>
 
-<div id="upload-area">
-  <input type="file" id="imageUpload" multiple accept="image/*" capture="environment" />
-  <p>※ カメラ撮影または画像選択（最大5人まで）</p>
-</div>
+<p>
+  <label>📷 カメラ撮影
+    <input type="file" accept="image/*" capture="environment">
+  </label>
+</p>
+<p>
+  <label>🖼 ファイル選択
+    <input type="file" accept="image/*">
+  </label>
+</p>
+
 
 
   <div id="members-container"></div>
