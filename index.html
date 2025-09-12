@@ -6,36 +6,21 @@
 <title>あみだくじ</title>
 <style>
   body { font-family:sans-serif; text-align:center; padding:10px; }
-  h1 { font-size:22px; margin-bottom:10px; }
-  #members-container { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:15px; min-height:70px; }
-  .member { width:60px; height:60px; border:2px solid #aaa; border-radius:8px; cursor:pointer; transition:0.2s; }
-  .member:hover { transform:scale(1.05); border-color:#3498db; }
-  .member img { width:100%; height:100%; object-fit:cover; }
-  #amida-slots { display:flex; justify-content:center; gap:10px; margin:15px 0; }
-  .slot { width:70px; height:90px; border:2px dashed #aaa; border-radius:10px; background:#f9f9f9;
-          display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; color:#999; transition:0.2s;}
-  .slot:hover { transform:scale(1.05); border-color:#f39c12; }
-  #start-button { padding:10px 20px; font-size:16px; cursor:pointer; margin-top:10px; }
-  #result { margin-top:20px; font-size:16px; font-weight:bold; }
-  ul { list-style:none; padding:0; }
-  li { margin:5px 0; }
-  li img { vertical-align:middle; margin-right:8px; border-radius:50%; width:24px; height:24px; }
+  .member { width:60px; height:60px; border:2px solid #aaa; border-radius:8px; cursor:pointer; display:inline-block; margin:5px; }
+  .slot { width:70px; height:90px; border:2px dashed #aaa; display:inline-flex; align-items:center; justify-content:center; margin:5px; cursor:pointer; }
 </style>
 </head>
 <body>
 
 <h1>あみだくじ 🎲</h1>
 
-<div id="upload-area">
-  <p>📷 カメラ<input type="file" id="cameraUpload" accept="image/*" capture="environment" multiple></p>
-  <p>🖼 ファイル選択<input type="file" id="fileUpload" accept="image/*" multiple></p>
-  <p>※ 最大5人まで</p>
-</div>
+<p>📷 カメラ<input type="file" id="cameraUpload" accept="image/*" capture="environment" multiple></p>
+<p>🖼 ファイル選択<input type="file" id="fileUpload" accept="image/*" multiple></p>
 
 <div id="members-container"></div>
 
-<h2 style="font-size:16px;">↓ タップしてスロットに配置 ↓</h2>
-<div id="amida-slots">
+<h2>スロットに配置</h2>
+<div id="slots-container">
   <div class="slot">Slot 1</div>
   <div class="slot">Slot 2</div>
   <div class="slot">Slot 3</div>
@@ -47,83 +32,61 @@
 <div id="result"></div>
 
 <script>
-const cameraUpload = document.getElementById("cameraUpload");
-const fileUpload = document.getElementById("fileUpload");
-const membersContainer = document.getElementById("members-container");
-const startButton = document.getElementById("start-button");
-const result = document.getElementById("result");
-
 let members = [];
 let selectedImage = null;
 
-// 画像アップロード
 function handleFiles(files){
-  const fileArr = Array.from(files).slice(0,5-members.length);
-  fileArr.forEach(file=>{
+  const arr = Array.from(files).slice(0,5-members.length);
+  arr.forEach(file=>{
     const reader = new FileReader();
     reader.onload = ()=>{
       const div = document.createElement("div");
-      div.className = "member";
-      div.id = `member-${members.length}`;
-      div.innerHTML = `<img src="${reader.result}" alt="member${members.length}" />`;
-      div.addEventListener("click",()=>selectMember(div.id));
-      membersContainer.appendChild(div);
-      members.push({id:div.id, image:reader.result});
+      div.className="member";
+      div.innerHTML=`<img src="${reader.result}" width="100%" height="100%">`;
+      div.onclick=()=>{ document.querySelectorAll(".member").forEach(m=>m.style.borderColor="#aaa"); div.style.borderColor="red"; selectedImage=reader.result; };
+      document.getElementById("members-container").appendChild(div);
+      members.push(reader.result);
     };
     reader.readAsDataURL(file);
   });
 }
 
-cameraUpload.addEventListener("change",(e)=>{handleFiles(e.target.files); cameraUpload.value="";});
-fileUpload.addEventListener("change",(e)=>{handleFiles(e.target.files); fileUpload.value="";});
-
-// メンバー選択
-function selectMember(id){
-  document.querySelectorAll(".member").forEach(m=>m.style.borderColor="#aaa");
-  const member = document.getElementById(id);
-  member.style.borderColor="red";
-  selectedImage = member.querySelector("img").src;
-}
+document.getElementById("cameraUpload").addEventListener("change",e=>{handleFiles(e.target.files); e.target.value="";});
+document.getElementById("fileUpload").addEventListener("change",e=>{handleFiles(e.target.files); e.target.value="";});
 
 // スロットに配置
-const slots = document.querySelectorAll(".slot");
-slots.forEach(slot=>{
+document.querySelectorAll(".slot").forEach(slot=>{
   slot.addEventListener("click", ()=>{
-    if(!selectedImage){ alert("画像を先に選んでください！"); return; }
-    slot.innerHTML = `<img src="${selectedImage}" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`;
+    if(!selectedImage){ alert("画像を選んでください"); return; }
+    slot.innerHTML=`<img src="${selectedImage}" style="width:100%;height:100%;">`;
   });
 });
 
 // あみだくじ開始
-startButton.addEventListener("click", ()=>{
-  const assigned = [];
-  slots.forEach(slot=>{
+document.getElementById("start-button").addEventListener("click", ()=>{
+  const assigned=[];
+  document.querySelectorAll(".slot").forEach(slot=>{
     const img = slot.querySelector("img");
     if(img) assigned.push({image:img.src});
   });
-  if(assigned.length!==5){ alert("5人すべてのスロットに画像を配置してください！"); return; }
+  if(assigned.length!==5){ alert("5つすべてのスロットに配置してください"); return; }
 
   const prizes = ["🍎 りんご","🎁 ギフト券","🍫 チョコ","☕ コーヒー","🎉 サプライズ！"];
   const shuffled = prizes.sort(()=>Math.random()-0.5);
 
-  let results=[];
   let output="<h3>結果発表 🎉</h3><ul>";
-  assigned.forEach((member,i)=>{
-    results.push({image:member.image, prize:shuffled[i]});
-    output += `<li><img src="${member.image}" /> → ${shuffled[i]}</li>`;
+  const results = [];
+  assigned.forEach((a,i)=>{
+    results.push({image:a.image, prize:shuffled[i]});
+    output+=`<li><img src="${a.image}" width="24" height="24"> → ${shuffled[i]}</li>`;
   });
-  output += "</ul>";
-  result.innerHTML = output;
+  output+="</ul>";
+  document.getElementById("result").innerHTML=output;
 
-  // GAS へ送信 (CORS 回避のため現状は同一ドメイン or GAS側で doPost でアクセス制御必須)
-  fetch("https://script.google.com/macros/s/AKfycbylFZXfshYRRO-ZY0iu68J9qC1SLtP-_X28N03tXCufpCg-qhajxZoBDYZrsXKgMqiUfQ/exec", {
-    method: "POST",
-    body: JSON.stringify({results}),
-    headers: {"Content-Type":"application/json"}
-  })
-  .then(res => res.text()) // JSON 解析せず文字列で受け取る
-  .then(txt => result.innerHTML += `<p>スプレッドシートに保存しました</p>`)
-  .catch(err => result.innerHTML += `<p style="color:red;">保存に失敗しました</p>`);
+  // GAS 側に送信
+  google.script.run.withSuccessHandler(msg=>{
+    document.getElementById("result").innerHTML += `<p>${msg}</p>`;
+  }).saveResults(results);
 });
 </script>
 
