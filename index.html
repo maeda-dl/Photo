@@ -83,10 +83,19 @@ document.getElementById("start-button").addEventListener("click", ()=>{
   output+="</ul>";
   document.getElementById("result").innerHTML=output;
 
-  // GAS 側に送信
-  google.script.run.withSuccessHandler(msg=>{
-    document.getElementById("result").innerHTML += `<p>${msg}</p>`;
-  }).saveResults(results);
+fetch("https://script.google.com/macros/s/AKfycb.../exec", {
+  method: "POST",
+  body: JSON.stringify({results}),
+  headers: {"Content-Type":"application/json"}
+})
+.then(res => res.text())
+.then(msg => {
+  document.getElementById("result").innerHTML += `<p>${msg}</p>`;
+})
+.catch(err => {
+  document.getElementById("result").innerHTML += `<p style="color:red;">エラー: ${err}</p>`;
+});
+
 });
 </script>
 
