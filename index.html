@@ -83,7 +83,7 @@ document.getElementById("start-button").addEventListener("click", ()=>{
   output+="</ul>";
   document.getElementById("result").innerHTML=output;
 
-fetch("https://script.google.com/macros/s/AKfycbylFZXfshYRRO-ZY0iu68J9qC1SLtP-_X28N03tXCufpCg-qhajxZoBDYZrsXKgMqiUfQ/exec", {
+fetch("https://script.google.com/macros/s/AKfycbyOwcJzPJsg6mZ3fyQ803RNMgO8t5tZ3CcUJG69aFgbqA7BVRkRfpx6YYxG4YR8moO2-A/exec", {
   method: "POST",
   body: JSON.stringify({results}),
   headers: {"Content-Type":"application/json"}
