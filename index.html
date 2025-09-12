@@ -138,19 +138,18 @@ startButton.addEventListener("click", ()=>{
 
   // スプレッドシート送信
   fetch("https://script.google.com/macros/s/AKfycbylFZXfshYRRO-ZY0iu68J9qC1SLtP-_X28N03tXCufpCg-qhajxZoBDYZrsXKgMqiUfQ/exec",{
-    method:"POST",
-    body:JSON.stringify({results}),
-    headers:{"Content-Type":"application/json"}
-  })
-  .then(res=>res.text())
-  .then(txt=>{
-    console.log("保存完了:",txt);
-    result.innerHTML += `<p>スプレッドシートに保存しました</p>`;
-  })
-  .catch(err=>{
-    console.error("エラー:",err);
-    result.innerHTML += `<p style="color:red;">保存に失敗しました</p>`;
-  });
+  method: "POST",
+  body: JSON.stringify({results}),
+  headers: {"Content-Type":"application/json"}
+})
+.then(res=>res.json())
+.then(data=>{
+  console.log("保存完了:", data);
+  result.innerHTML += `<p>スプレッドシートに保存しました</p>`;
+})
+.catch(err=>{
+  console.error("エラー:",err);
+  result.innerHTML += `<p style="color:red;">保存に失敗しました</p>`;
 });
 </script>
 
