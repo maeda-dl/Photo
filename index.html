@@ -103,15 +103,21 @@ function selectMember(id){
 }
 
 // スロットに配置
-function setSlot(slot){
-  if(!selectedImage){ alert("画像を先に選んでください！"); return; }
-  slot.innerHTML = `<img src="${selectedImage}" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`;
-}
+const slots = document.querySelectorAll(".slot");
+slots.forEach(slot => {
+  slot.addEventListener("click", () => {
+    if(!selectedImage){
+      alert("画像を先に選んでください！");
+      return;
+    }
+    slot.innerHTML = `<img src="${selectedImage}" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`;
+  });
+});
 
 // あみだくじ開始
 startButton.addEventListener("click", ()=>{
   const assigned=[];
-  document.querySelectorAll(".slot").forEach(slot=>{
+  slots.forEach(slot=>{
     const img = slot.querySelector("img");
     if(img) assigned.push({image:img.src});
   });
@@ -131,7 +137,7 @@ startButton.addEventListener("click", ()=>{
   result.innerHTML=output;
 
   // スプレッドシート送信
-  fetch("https://script.google.com/macros/s/AKfycbw5vHQwbTU9psJaqu-glyq04XI3m5rzWJBEw3Ip1Pavi5jKbkJ8TAt29RqtJdJKXn7NNw/exec",{
+  fetch("★あなたの/exec URL★",{
     method:"POST",
     body:JSON.stringify({results}),
     headers:{"Content-Type":"application/json"}
